@@ -5,6 +5,7 @@ const express = require('express');
 const app = express();
 var random = require("random-key");
 const { encryptStringWithRsaPublicKey } = require('./encrypt.js')
+const crypto = require('crypto');
 app.use(cors());
 app.use(express.json());
 
@@ -23,27 +24,26 @@ app.post('/api/auth', async (req, res) => {
         let sPublicKeyPath = "./PublicKey/einv_sandbox.pem"
         let oData = req.body;
         let sEncryptedPwd = encryptStringWithRsaPublicKey(oData.Password, sPublicKeyPath);
-        let sApiKey = "VVZB+6TCvG5lBKb04jYxHwvNnYij+S3WjUmP2bL0UyI=";
+        let sApiKey = crypto.randomBytes(32).toString("base64");
         let sEncryptedApiKey = encryptStringWithRsaPublicKey(sApiKey, sPublicKeyPath);
         let oHeaders = {
             "client_id": "AAFCM09TXPQMD20",
             "client_secret": "XLl2zF4Tsh8MBaPo5IiW"
-            // "content-type": "application/json",
-            // "x-requested-with":"XMLHttpRequest"
         }
-        oData.Password = sEncryptedPwd;
-        oData.AppKey = sEncryptedApiKey;
         oData.ForceRefreshAccessToken = false;
         let oPayload = {
-            data: {
+            "data": {
                 "UserName": oData.UserName,
-                "Password": oData.Password,
-                "AppKey": oData.AppKey,
-                "ForceRefreshAccessToken": oData.ForceRefreshAccessToken
+                "Password": sEncryptedPwd,
+                "AppKey": sEncryptedApiKey,
+                "ForceRefreshAccessToken": false
             }
         }
-        let oResponse = await axios.post("/gstvital/v1.02/auth", oPayload, { headers: oHeaders });
-        debugger
+        let {data} = await axios.post("/gstvital/v1.02/auth", oPayload, { headers: oHeaders });
+        res.status(200).json({
+            Status: "Error",
+            Message: data,
+        })
     } catch (error) {
         debugger;
         res.status(400).json({
