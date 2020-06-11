@@ -6,7 +6,7 @@ function encryptStringWithRsaPublicKey (toEncrypt, relativeOrAbsolutePathToPubli
     var absolutePath = path.resolve(relativeOrAbsolutePathToPublicKey);
     var publicKey = fs.readFileSync(absolutePath, "utf8");
     var buffer = Buffer.from(toEncrypt);
-    var encrypted = crypto.pulicEncrypt(publicKey, buffer);
+    var encrypted = crypto.publicEncrypt(publicKey, buffer);
     return encrypted.toString("base64");
 };
 
