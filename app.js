@@ -19,12 +19,12 @@ app.get('/api', (req, res) => {
 })
 
 app.post('/api/auth', async (req, res) => {
-    debugger;
     try {
         let sPublicKeyPath = "./PublicKey/einv_sandbox.pem"
         let oData = req.body;
         let sEncryptedPwd = encryptStringWithRsaPublicKey(oData.Password, sPublicKeyPath);
-        let sApiKey = crypto.randomBytes(32).toString("base64");
+        let sApiKey = crypto.randomBytes(32);
+        console.log(sApiKey)
         let sEncryptedApiKey = encryptStringWithRsaPublicKey(sApiKey, sPublicKeyPath);
         let oHeaders = {
             "client_id": "AAFCM09TXPQMD20",
@@ -41,11 +41,9 @@ app.post('/api/auth', async (req, res) => {
         }
         let {data} = await axios.post("/gstvital/v1.02/auth", oPayload, { headers: oHeaders });
         res.status(200).json({
-            Status: "Error",
             Message: data,
         })
     } catch (error) {
-        debugger;
         res.status(400).json({
             Status: "Error",
             Message: error,
