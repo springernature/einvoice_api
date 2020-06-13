@@ -4,7 +4,7 @@ const axios = require('./axios.js');
 const express = require('express');
 const app = express();
 var random = require("random-key");
-const { encryptStringWithRsaPublicKey } = require('./encrypt.js')
+const { encryptStringWithRsaPublicKey, aesDecryption } = require('./encrypt.js')
 const crypto = require('crypto');
 app.use(cors());
 app.use(express.json());
@@ -23,9 +23,8 @@ app.post('/api/auth', async (req, res) => {
         let sPublicKeyPath = "./PublicKey/einv_sandbox.pem"
         let oData = req.body;
         let sEncryptedPwd = encryptStringWithRsaPublicKey(oData.Password, sPublicKeyPath);
-        let sApiKey = crypto.randomBytes(32);
-        console.log(sApiKey)
-        let sEncryptedApiKey = encryptStringWithRsaPublicKey(sApiKey, sPublicKeyPath);
+        let sAppKey = crypto.randomBytes(32);
+        let sEncryptedAppKey = encryptStringWithRsaPublicKey(sAppKey, sPublicKeyPath);
         let oHeaders = {
             "client_id": "AAFCM09TXPQMD20",
             "client_secret": "XLl2zF4Tsh8MBaPo5IiW"
@@ -35,11 +34,12 @@ app.post('/api/auth', async (req, res) => {
             "data": {
                 "UserName": oData.UserName,
                 "Password": sEncryptedPwd,
-                "AppKey": sEncryptedApiKey,
+                "AppKey": sEncryptedAppKey,
                 "ForceRefreshAccessToken": false
             }
         }
         let {data} = await axios.post("/gstvital/v1.02/auth", oPayload, { headers: oHeaders });
+        data.Data.Sek = aesDecryption(data.Data.Sek, sAppKey);        
         res.status(200).json({
             Message: data,
         })
