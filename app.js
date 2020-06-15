@@ -18,6 +18,17 @@ app.get('/api', (req, res) => {
     });
 })
 
+app.post('/api/env/:var', (req, res)=>{
+    console.log(process.env[req.params.var]);
+    const process_env = {
+        "env_var": process.env[req.params.var]
+    };
+    res.status(200).json({
+        Status:"Success",
+        Response: process_env
+    })
+})
+
 app.post('/api/auth', async (req, res) => {
     try {
         // console.log(process.env.NODE_ENV);

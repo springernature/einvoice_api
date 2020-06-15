@@ -9,3 +9,4 @@ applications:
   - route: einvoice-api-dev.springernature.app
   env:
     NODE_ENV: "development"
+    PUBLIC_KEY_PATH: "./public_key_dev/einv_sandbox.pem"
