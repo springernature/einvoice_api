@@ -20,8 +20,8 @@ app.get('/api', (req, res) => {
 
 app.post('/api/auth', async (req, res) => {
     try {
-        console.log(process.env.NODE_ENV);
-        console.log(process.env.PUBLIC_KEY_PATH);
+        // console.log(process.env.NODE_ENV);
+        // console.log(process.env.PUBLIC_KEY_PATH);
         let sPublicKeyPath = "./public_key_dev/einv_sandbox.pem"
         let oData = req.body;
         let sEncryptedPwd = encryptStringWithRsaPublicKey(oData.Password, sPublicKeyPath);
