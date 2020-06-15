@@ -1,0 +1,11 @@
+---
+applications:
+- name: einvoice-api
+  instances: 1
+  stack: cflinuxfs3
+  memory: 256M
+  buildpack: https://github.com/cloudfoundry/nodejs-buildpack
+  routes:
+  - route: einvoice-api-dev.springernature.app
+  env:
+    NODE_ENV: "development"
