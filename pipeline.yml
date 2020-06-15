@@ -20,7 +20,7 @@ resources:
     bucket: ((halfpipe-semver.bucket))
     driver: gcs
     json_key: ((halfpipe-semver.private_key))
-    key: SAPTECH-einvoice_api
+    key: saptech-einvoice_api
 - name: CF snpaas dev
   type: cf-resource
   source:
