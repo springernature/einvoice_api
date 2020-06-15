@@ -1,4 +1,4 @@
-team: SAPTECH
+team: saptech
 pipeline: einvoice_api
 
 triggers:
