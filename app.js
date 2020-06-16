@@ -18,26 +18,24 @@ app.get('/api', (req, res) => {
     });
 })
 
-app.post('/api/env/:var', (req, res)=>{
+app.post('/api/env/:var', (req, res) => {
     console.log(process.env[req.params.var]);
     const process_env = {
         "env_var": process.env[req.params.var]
     };
     res.status(200).json({
-        Status:"Success",
+        Status: "Success",
         Response: process_env
     })
 })
 
 app.post('/api/auth', async (req, res) => {
     try {
-        // console.log(process.env.NODE_ENV);
-        // console.log(process.env.PUBLIC_KEY_PATH);
-        let sPublicKeyPath = "./public_key_dev/einv_sandbox.pem"
         let oData = req.body;
-        let sEncryptedPwd = encryptStringWithRsaPublicKey(oData.Password, sPublicKeyPath);
+        let sPublicKeyPath = !oData.public_key ? "./public_key_dev/einv_sandbox.pem" : null
+        let sEncryptedPwd = encryptStringWithRsaPublicKey(oData.Password, oData.public_key, sPublicKeyPath);
         let sAppKey = crypto.randomBytes(32);
-        let sEncryptedAppKey = encryptStringWithRsaPublicKey(sAppKey, sPublicKeyPath);
+        let sEncryptedAppKey = encryptStringWithRsaPublicKey(sAppKey, oData.public_key, sPublicKeyPath);
         let oHeaders = {
             "client_id": oData.client_id,
             "client_secret": oData.client_secret
@@ -51,10 +49,10 @@ app.post('/api/auth', async (req, res) => {
                 "ForceRefreshAccessToken": false
             }
         }
-        let {data} = await axios.post("/gstvital/v1.02/auth", oPayload, { headers: oHeaders });
-        data.Data.Sek = aesDecryption(data.Data.Sek, sAppKey);        
+        let { data } = await axios.post("/gstvital/v1.02/auth", oPayload, { headers: oHeaders });
+        data.Data.Sek = aesDecryption(data.Data.Sek, sAppKey);
         res.status(200).json({
-            Status:"Success",
+            Status: "Success",
             Response: data,
         })
     } catch (error) {
