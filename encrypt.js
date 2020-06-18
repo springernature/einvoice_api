@@ -32,5 +32,23 @@ function aesDecryption(encryptedText, appkey) {
     }
 };
 
+function aesEncryption(jsonData, sek) {
+    try
+    {
+        const data = JSON.stringify(jsonData);
+        const keyBytes = CryptoJs.enc.Base64.parse(sek); 
+        var aEncryptWordArray = CryptoJs.AES.encrypt(data, keyBytes, {
+            mode:CryptoJs.mode.ECB,
+            padding:CryptoJs.pad.Pkcs7
+        });
+        return aEncryptWordArray.toString();
+    }
+    catch (error)
+    {
+        debugger;
+      throw error;
+    }
+};
 
-module.exports = {encryptStringWithRsaPublicKey,aesDecryption}
+
+module.exports = {encryptStringWithRsaPublicKey,aesDecryption, aesEncryption}

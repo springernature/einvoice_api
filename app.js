@@ -4,7 +4,7 @@ const axios = require('./axios.js');
 const express = require('express');
 const app = express();
 var random = require("random-key");
-const { encryptStringWithRsaPublicKey, aesDecryption } = require('./encrypt.js')
+const { encryptStringWithRsaPublicKey, aesDecryption, aesEncryption} = require('./encrypt.js')
 const crypto = require('crypto');
 app.use(cors());
 app.use(express.json());
@@ -56,6 +56,30 @@ app.post('/api/auth', async (req, res) => {
             Response: data,
         })
     } catch (error) {
+        res.status(400).json({
+            Status: "Error",
+            Message: error,
+        })
+    }
+})
+
+app.post('/api/irn/create', async (req, res)=>{
+    try {
+        debugger;
+        let oData = req.body,
+        oHeader = req.headers;
+    let sEncryptedData = aesEncryption(oData, oHeader.sek)
+    let oHeaders = {
+        "client_id": oHeader.client_id,
+        "client_secret": oHeader.client_secret,
+        "Gstin": oHeader.gstin,
+        "user_name": oHeader.user_name,
+        "AuthToken": oHeader.authtoken
+    }
+    let {data} = await axios.post("/gstcore/v1.02/Invoice", sEncryptedData, {headers: oHeaders});
+    debugger;
+    } catch (error) {
+        debugger;
         res.status(400).json({
             Status: "Error",
             Message: error,
