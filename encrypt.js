@@ -22,8 +22,7 @@ function aesDecryption(encryptedText, appkey) {
             mode:CryptoJs.mode.ECB,
             padding:CryptoJs.pad.Pkcs7
         });
-        var decryptedMessage = CryptoJs.SHA256(aDecryptWordArray);
-        return decryptedMessage.toString(CryptoJs.enc.Base64)
+        return CryptoJs.enc.Base64.stringify(aDecryptWordArray)
     }
     catch (error)
     {
@@ -36,23 +35,24 @@ function aesEncryption(jsonData, sek) {
     try
     {
         console.log(sek);
-        const data = JSON.stringify(jsonData);
-        const keyBytes = CryptoJs.enc.Base64.parse(sek.toString("base64")); 
-        // var aEncryptWordArray = CryptoJs.AES.encrypt(data, keyBytes, {
-        //     mode:CryptoJs.mode.ECB,
-        //     padding:CryptoJs.pad.Pkcs7
-        // });
+        let data = JSON.stringify(jsonData);
+        // Step2 - Convert data to WordAray
+        let wdData = CryptoJs.enc.Utf8.parse(data)
+
+        // Step3 - Get the word array of Sek
+        const keyBytes = CryptoJs.enc.Base64.parse(sek.toString("base64"));
+        
+        // Step4 - Create AES encryptor and encrypt the data
         var aesEncryptor = CryptoJs.algo.AES.createEncryptor(keyBytes, {
             mode: CryptoJs.mode.ECB,
             padding:CryptoJs.pad.Pkcs7
         })
-
-        var aEncryptWordArray = aesEncryptor.process(data);
-        // var aEncryptWordArray1 = aesEncryptor.finalize();
+        var aEncryptWordArray = aesEncryptor.process(wdData);
         var aEncryptWordArray1 = aEncryptWordArray.concat(aesEncryptor.finalize());
-        console.log(CryptoJs.enc.Base64.stringify(aEncryptWordArray))
-        debugger;
-        return CryptoJs.enc.Base64.stringify(aEncryptWordArray);
+
+        // Step4 - Convert the encoded data to base64 string
+        console.log(CryptoJs.enc.Base64.stringify(aEncryptWordArray1))
+        return CryptoJs.enc.Base64.stringify(aEncryptWordArray1);
     }
     catch (error)
     {
