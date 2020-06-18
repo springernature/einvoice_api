@@ -35,13 +35,24 @@ function aesDecryption(encryptedText, appkey) {
 function aesEncryption(jsonData, sek) {
     try
     {
+        console.log(sek);
         const data = JSON.stringify(jsonData);
-        const keyBytes = CryptoJs.enc.Base64.parse(sek); 
-        var aEncryptWordArray = CryptoJs.AES.encrypt(data, keyBytes, {
-            mode:CryptoJs.mode.ECB,
+        const keyBytes = CryptoJs.enc.Base64.parse(sek.toString("base64")); 
+        // var aEncryptWordArray = CryptoJs.AES.encrypt(data, keyBytes, {
+        //     mode:CryptoJs.mode.ECB,
+        //     padding:CryptoJs.pad.Pkcs7
+        // });
+        var aesEncryptor = CryptoJs.algo.AES.createEncryptor(keyBytes, {
+            mode: CryptoJs.mode.ECB,
             padding:CryptoJs.pad.Pkcs7
-        });
-        return aEncryptWordArray.toString();
+        })
+
+        var aEncryptWordArray = aesEncryptor.process(data);
+        // var aEncryptWordArray1 = aesEncryptor.finalize();
+        var aEncryptWordArray1 = aEncryptWordArray.concat(aesEncryptor.finalize());
+        console.log(CryptoJs.enc.Base64.stringify(aEncryptWordArray))
+        debugger;
+        return CryptoJs.enc.Base64.stringify(aEncryptWordArray);
     }
     catch (error)
     {

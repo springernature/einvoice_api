@@ -65,7 +65,6 @@ app.post('/api/auth', async (req, res) => {
 
 app.post('/api/irn/create', async (req, res)=>{
     try {
-        debugger;
         let oData = req.body,
         oHeader = req.headers;
     let sEncryptedData = aesEncryption(oData, oHeader.sek)
@@ -76,8 +75,14 @@ app.post('/api/irn/create', async (req, res)=>{
         "user_name": oHeader.user_name,
         "AuthToken": oHeader.authtoken
     }
-    let {data} = await axios.post("/gstcore/v1.02/Invoice", sEncryptedData, {headers: oHeaders});
-    debugger;
+    var oPayload = {
+        "Data":sEncryptedData
+    }
+    let {data} = await axios.post("/gstcore/v1.02/Invoice", oPayload, {headers: oHeaders});
+    res.status(200).json({
+        Status: "Error",
+        Message: data,
+    })
     } catch (error) {
         debugger;
         res.status(400).json({
