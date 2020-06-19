@@ -34,15 +34,14 @@ function aesDecryption(encryptedText, appkey) {
 function aesEncryption(jsonData, sek) {
     try
     {
-        console.log(sek);
         let data = JSON.stringify(jsonData);
-        // Step2 - Convert data to WordAray
+        // Step1 - Convert data to WordAray
         let wdData = CryptoJs.enc.Utf8.parse(data)
 
-        // Step3 - Get the word array of Sek
+        // Step2 - Get the word array of Sek
         const keyBytes = CryptoJs.enc.Base64.parse(sek.toString("base64"));
         
-        // Step4 - Create AES encryptor and encrypt the data
+        // Step3 - Create AES encryptor and encrypt the data
         var aesEncryptor = CryptoJs.algo.AES.createEncryptor(keyBytes, {
             mode: CryptoJs.mode.ECB,
             padding:CryptoJs.pad.Pkcs7
@@ -51,7 +50,6 @@ function aesEncryption(jsonData, sek) {
         var aEncryptWordArray1 = aEncryptWordArray.concat(aesEncryptor.finalize());
 
         // Step4 - Convert the encoded data to base64 string
-        console.log(CryptoJs.enc.Base64.stringify(aEncryptWordArray1))
         return CryptoJs.enc.Base64.stringify(aEncryptWordArray1);
     }
     catch (error)
@@ -61,5 +59,23 @@ function aesEncryption(jsonData, sek) {
     }
 };
 
+function aesDataDecryption(encryptedData, sek) {
+    try
+    {
+        const keyBytes = CryptoJs.enc.Base64.parse(sek.toString("base64")); 
+        var aDecryptWordArray = CryptoJs.AES.decrypt(encryptedData, keyBytes, {
+            mode:CryptoJs.mode.ECB,
+            padding:CryptoJs.pad.Pkcs7
+        });
+        var oDecryptedData = JSON.parse(CryptoJs.enc.Utf8.stringify(aDecryptWordArray));
+        return oDecryptedData;
+    }
+    catch (error)
+    {
+        debugger;
+      throw error;
+    }
+}
 
-module.exports = {encryptStringWithRsaPublicKey,aesDecryption, aesEncryption}
+
+module.exports = {encryptStringWithRsaPublicKey, aesDecryption, aesEncryption, aesDataDecryption}

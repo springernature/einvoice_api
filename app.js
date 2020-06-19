@@ -4,7 +4,7 @@ const axios = require('./axios.js');
 const express = require('express');
 const app = express();
 var random = require("random-key");
-const { encryptStringWithRsaPublicKey, aesDecryption, aesEncryption} = require('./encrypt.js')
+const { encryptStringWithRsaPublicKey, aesDecryption, aesEncryption, aesDataDecryption } = require('./encrypt.js')
 const crypto = require('crypto');
 app.use(cors());
 app.use(express.json());
@@ -63,26 +63,37 @@ app.post('/api/auth', async (req, res) => {
     }
 })
 
-app.post('/api/irn/create', async (req, res)=>{
+app.post('/api/irn/create', async (req, res) => {
     try {
         let oData = req.body,
-        oHeader = req.headers;
-    let sEncryptedData = aesEncryption(oData, oHeader.sek)
-    let oHeaders = {
-        "client_id": oHeader.client_id,
-        "client_secret": oHeader.client_secret,
-        "Gstin": oHeader.gstin,
-        "user_name": oHeader.user_name,
-        "AuthToken": oHeader.authtoken
-    }
-    var oPayload = {
-        "Data":sEncryptedData
-    }
-    let {data} = await axios.post("/gstcore/v1.02/Invoice", oPayload, {headers: oHeaders});
-    res.status(200).json({
-        Status: "Error",
-        Message: data,
-    })
+            oHeader = req.headers,
+            aResponse = [];
+        for (let i = 0; i < oData.length; i++) {
+            let oItem = oData[i];
+            let oResponse = {};
+            let sEncryptedData = aesEncryption(oItem, oHeader.sek)
+            oResponse.doc_no = oItem.DocDtls.No;
+            let oHeaders = {
+                "client_id": oHeader.client_id,
+                "client_secret": oHeader.client_secret,
+                "Gstin": oHeader.gstin,
+                "user_name": oHeader.user_name,
+                "AuthToken": oHeader.authtoken
+            }
+            var oPayload = {
+                "Data": sEncryptedData
+            }
+            let { data } = await axios.post("/gstcore/v1.02/Invoice", oPayload, { headers: oHeaders });
+            oResponse.res = data;
+            if(!data.ErrorDetails){
+                oDecryptedData = aesDataDecryption(data.Data, oHeader.sek);
+                oResponse.res.Data = oDecryptedData;
+            }
+            aResponse.push(oResponse);    
+        }
+        res.status(200).json({
+            Message: aResponse,
+        })
     } catch (error) {
         debugger;
         res.status(400).json({
