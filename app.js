@@ -18,6 +18,16 @@ app.get('/api', (req, res) => {
     });
 })
 
+app.post('/api/data', (req, res) => {
+    debugger;
+    let data = req.body;
+    res.status(200).json({
+        Status: "Success",
+        data: data
+    });
+})
+
+
 app.post('/api/env/:var', (req, res) => {
     console.log(process.env[req.params.var]);
     const process_env = {
@@ -32,10 +42,11 @@ app.post('/api/env/:var', (req, res) => {
 app.post('/api/auth', async (req, res) => {
     try {
         let oData = req.body;
-        let sPublicKeyPath = !oData.public_key ? "./public_key_dev/einv_sandbox.pem" : null
-        let sEncryptedPwd = encrypt.encryptStringWithRsaPublicKey(oData.Password, oData.public_key, sPublicKeyPath);
+        let sPublicKeyPath = !oData.publickey1 ? "./public_key_dev/einv_sandbox.pem" : null;
+        let sPublicKey = oData.publickey1 ? oData.publickey1 + oData.publickey2 + oData.publickey3 : null; 
+        let sEncryptedPwd = encrypt.encryptStringWithRsaPublicKey(oData.Password, sPublicKey, sPublicKeyPath);
         let sAppKey = crypto.randomBytes(32);
-        let sEncryptedAppKey = encrypt.encryptStringWithRsaPublicKey(sAppKey, oData.public_key, sPublicKeyPath);
+        let sEncryptedAppKey = encrypt.encryptStringWithRsaPublicKey(sAppKey, sPublicKey, sPublicKeyPath);
         let oHeaders = {
             "client_id": oData.client_id,
             "client_secret": oData.client_secret
