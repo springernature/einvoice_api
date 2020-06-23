@@ -145,7 +145,6 @@ app.post('/api/irn/cancel', async (req, res) => {
         let oData = req.body,
             oHeader = req.headers,
             aResponse = [];
-            debugger;
         for (let i = 0; i < oData.length; i++) {
             let oItem = {};
             let oResponse = {};
@@ -181,6 +180,19 @@ app.post('/api/irn/cancel', async (req, res) => {
             Status: "Error",
             Message: error,
         })
+    }
+})
+
+app.post("/api/ewaybill/create", (req, res)=>{
+    let aData = req.body,
+    oHeader = req.headers,
+    aResponse = [];
+
+    for (let i = 0; i < aData.length; i++) {
+        let oData = {};
+        let oItem = {};
+        let oResponse = {};
+        
     }
 })
 
