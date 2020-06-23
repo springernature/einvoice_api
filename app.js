@@ -117,7 +117,7 @@ app.post('/api/irn/fetch', async (req, res) => {
         
     for (let i = 0; i < aData.length; i++) {
         let oData = aData[i];
-        let sIrn = oData.irn_no,
+        let sIrn = oData.Irn,
             oResponse = {};
         oResponse.doc_no = oData.doc_no;
         const { data } = await axios.get('gstcore/v1.02/Invoice/irn/' + sIrn, { headers: oHeaders });
@@ -128,6 +128,51 @@ app.post('/api/irn/fetch', async (req, res) => {
         }
         aResponse.push(oResponse);
     }
+        res.status(200).json({
+            Message: aResponse,
+        })
+    } catch (error) {
+        res.status(400).json({
+            Status: "Error",
+            Message: error,
+        })
+    }
+})
+
+
+app.post('/api/irn/cancel', async (req, res) => {
+    try {
+        let oData = req.body,
+            oHeader = req.headers,
+            aResponse = [];
+            debugger;
+        for (let i = 0; i < oData.length; i++) {
+            let oItem = {};
+            let oResponse = {};
+            oResponse.doc_no = oData[i].doc_no;
+            oItem.Irn = oData[i].Irn;
+            oItem.CnlRsn = oData[i].CnlRsn;
+            oItem.CnlRem = oData[i].CnlRem;
+
+            let sEncryptedData = encrypt.aesEncryption(oItem, oHeader.sek)
+            let oHeaders = {
+                "client_id": oHeader.client_id,
+                "client_secret": oHeader.client_secret,
+                "Gstin": oHeader.gstin,
+                "user_name": oHeader.user_name,
+                "AuthToken": oHeader.authtoken
+            }
+            var oPayload = {
+                "Data": sEncryptedData
+            }
+            let { data } = await axios.post("/gstcore/v1.02/Invoice/Cancel", oPayload, { headers: oHeaders });
+            oResponse.res = data;
+            if (!data.ErrorDetails) {
+                oDecryptedData = encrypt.aesDataDecryption(data.Data, oHeader.sek);
+                oResponse.res.Data = oDecryptedData;
+            }
+            aResponse.push(oResponse);
+        }
         res.status(200).json({
             Message: aResponse,
         })
