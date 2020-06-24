@@ -40,11 +40,12 @@ app.post('/api/env/:var', (req, res) => {
 })
 
 app.post('/api/auth', async (req, res) => {
-    debugger;
     try {
         let oData = req.body;
-        let sPublicKeyPath = !oData.publickey1 ? "./public_key_dev/einv_sandbox.pem" : null;
-        let sPublicKey = oData.publickey1 ? oData.publickey1 + oData.publickey2 + oData.publickey3 : null; 
+        let sPublicKeyPath = "./public_key_dev/einv_sandbox.pem";
+        // let sPublicKeyPath = !oData.publickey1 ? "./public_key_dev/einv_sandbox.pem" : null;
+        // let sPublicKey = oData.publickey1 ? oData.publickey1 + oData.publickey2 + oData.publickey3 : null; 
+        let sPublicKey = null; 
         let sEncryptedPwd = encrypt.encryptStringWithRsaPublicKey(oData.password, sPublicKey, sPublicKeyPath);
         let sAppKey = crypto.randomBytes(32);
         let sEncryptedAppKey = encrypt.encryptStringWithRsaPublicKey(sAppKey, sPublicKey, sPublicKeyPath);
