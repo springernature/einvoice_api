@@ -40,11 +40,12 @@ app.post('/api/env/:var', (req, res) => {
 })
 
 app.post('/api/auth', async (req, res) => {
+    debugger;
     try {
         let oData = req.body;
         let sPublicKeyPath = !oData.publickey1 ? "./public_key_dev/einv_sandbox.pem" : null;
         let sPublicKey = oData.publickey1 ? oData.publickey1 + oData.publickey2 + oData.publickey3 : null; 
-        let sEncryptedPwd = encrypt.encryptStringWithRsaPublicKey(oData.Password, sPublicKey, sPublicKeyPath);
+        let sEncryptedPwd = encrypt.encryptStringWithRsaPublicKey(oData.password, sPublicKey, sPublicKeyPath);
         let sAppKey = crypto.randomBytes(32);
         let sEncryptedAppKey = encrypt.encryptStringWithRsaPublicKey(sAppKey, sPublicKey, sPublicKeyPath);
         let oHeaders = {
@@ -54,7 +55,7 @@ app.post('/api/auth', async (req, res) => {
         oData.ForceRefreshAccessToken = false;
         let oPayload = {
             "data": {
-                "UserName": oData.UserName,
+                "UserName": oData.user_name,
                 "Password": sEncryptedPwd,
                 "AppKey": sEncryptedAppKey,
                 "ForceRefreshAccessToken": false
