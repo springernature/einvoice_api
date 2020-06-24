@@ -42,10 +42,10 @@ app.post('/api/env/:var', (req, res) => {
 app.post('/api/auth', async (req, res) => {
     try {
         let oData = req.body;
-        let sPublicKeyPath = "./public_key_dev/einv_sandbox.pem";
-        // let sPublicKeyPath = !oData.publickey1 ? "./public_key_dev/einv_sandbox.pem" : null;
-        // let sPublicKey = oData.publickey1 ? oData.publickey1 + oData.publickey2 + oData.publickey3 : null; 
-        let sPublicKey = null; 
+        // let sPublicKeyPath = "./public_key_dev/einv_sandbox.pem";
+        let sPublicKeyPath = !oData.PUBLICKEY1 ? "./public_key_dev/einv_sandbox.pem" : null;
+        let sPublicKey = oData.PUBLICKEY1 ? oData.PUBLICKEY1 + oData.PUBLICKEY2 + oData.PUBLICKEY3 : null; 
+        // let sPublicKey = null; 
         let sEncryptedPwd = encrypt.encryptStringWithRsaPublicKey(oData.PASSWORD, sPublicKey, sPublicKeyPath);
         let sAppKey = crypto.randomBytes(32);
         let sEncryptedAppKey = encrypt.encryptStringWithRsaPublicKey(sAppKey, sPublicKey, sPublicKeyPath);
@@ -56,8 +56,7 @@ app.post('/api/auth', async (req, res) => {
         oData.ForceRefreshAccessToken = false;
         let oPayload = {
             "data": {
-                // "UserName": oData.user_name,
-                "UserName": "Shreesh",
+                "UserName": oData.USERNAME,
                 "Password": sEncryptedPwd,
                 "AppKey": sEncryptedAppKey,
                 "ForceRefreshAccessToken": false
