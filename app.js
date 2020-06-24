@@ -6,6 +6,7 @@ const app = express();
 var random = require("random-key");
 const encrypt = require('./encrypt.js')
 const crypto = require('crypto');
+const getJSON = require('./getjson.js')
 app.use(cors());
 app.use(express.json());
 
@@ -19,7 +20,6 @@ app.get('/api', (req, res) => {
 })
 
 app.post('/api/data', (req, res) => {
-    debugger;
     let data = req.body;
     res.status(200).json({
         Status: "Success",
@@ -40,7 +40,6 @@ app.post('/api/env/:var', (req, res) => {
 })
 
 app.post('/api/auth', async (req, res) => {
-    debugger;
     try {
         let oData = req.body;
         let sPublicKeyPath = !oData.PUBLICKEY1 ? "./public_key_dev/einv_sandbox.pem" : null;
@@ -82,7 +81,8 @@ app.post('/api/irn/create', async (req, res) => {
             oHeader = req.headers,
             aResponse = [];
         for (let i = 0; i < oData.length; i++) {
-            let oItem = oData[i];
+            let reqData = oData[i];
+            let oItem = getJSON.formatData(reqData);
             let oResponse = {};
             let sEncryptedData = encrypt.aesEncryption(oItem, oHeader.sek)
             oResponse.doc_no = oItem.DocDtls.No;
@@ -166,17 +166,17 @@ app.post('/api/irn/cancel', async (req, res) => {
             oItem.CnlRsn = oData[i].CnlRsn;
             oItem.CnlRem = oData[i].CnlRem;
 
-            let sEncryptedData = encrypt.aesEncryption(oItem, oHeader.sek)
+            let sEncryptedData = encrypt.aesEncryption(oItem, oHeader.sek);
             let oHeaders = {
                 "client_id": oHeader.client_id,
                 "client_secret": oHeader.client_secret,
                 "Gstin": oHeader.gstin,
                 "user_name": oHeader.user_name,
                 "AuthToken": oHeader.authtoken
-            }
+            };
             var oPayload = {
                 "Data": sEncryptedData
-            }
+            };
             let { data } = await axios.post("/gstcore/v1.02/Invoice/Cancel", oPayload, { headers: oHeaders });
             oResponse.res = data;
             if (!data.ErrorDetails) {
