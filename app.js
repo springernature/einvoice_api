@@ -56,7 +56,8 @@ app.post('/api/auth', async (req, res) => {
         oData.ForceRefreshAccessToken = false;
         let oPayload = {
             "data": {
-                "UserName": oData.user_name,
+                // "UserName": oData.user_name,
+                "UserName": "Shreesh",
                 "Password": sEncryptedPwd,
                 "AppKey": sEncryptedAppKey,
                 "ForceRefreshAccessToken": false
