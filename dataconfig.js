@@ -64,7 +64,7 @@ function documentSchema() {
             "CesVal": 0,
             "StCesVal": 0,
             "RndOffAmt": 0,
-            "TotInvVal": 3200.4
+            "TotInvVal": 0
         },
         "ExpDtls": {
             "ShipBNo": null,
