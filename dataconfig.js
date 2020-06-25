@@ -112,7 +112,7 @@ function itemListSchema() {
 
 function fieldMapping() {
     return {
-        "TRNS_DTLS": "TranDtls",
+        "TRAN_DTLS": "TranDtls",
         "TAX_SCH": "TaxSch",
         "SUP_TYP": "SupTyp",
         "REG_REV": "RegRev",
