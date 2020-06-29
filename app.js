@@ -1,10 +1,10 @@
 const Joi = require('@hapi/joi');
 var cors = require('cors');
-const axios = require('./axios.js');
+const axios = require('./resources/axios.js');
 const express = require('express');
 const app = express();
 var random = require("random-key");
-const encrypt = require('./encrypt.js')
+const encrypt = require('./resources/encrypt.js')
 const crypto = require('crypto');
 const getJSON = require('./configuration/getjson.js')
 app.use(cors());
