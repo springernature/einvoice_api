@@ -110,7 +110,7 @@ function itemListSchema() {
     }
 }
 
-function fieldMapping() {
+function createIrnFieldMapping() {
     return {
         "TRAN_DTLS": "TranDtls",
         "TAX_SCH": "TaxSch",
@@ -195,4 +195,21 @@ function fieldMapping() {
     }
 }
 
-module.exports = { documentSchema, itemListSchema, fieldMapping }
+function cancelIrnFieldMapping(){
+    return{
+        "IRN_NO":"Irn",
+        "CNL_RSN":"CnlRsn",
+        "CNL_REM":"CnlRem"
+        // "NO":"No"
+    }
+}
+
+function cancelIrnSchema(){
+    return {
+        "Irn":null,
+        "CnlRsn":null,
+        "CnlRem":null
+    }
+}
+
+module.exports = { documentSchema, itemListSchema, createIrnFieldMapping, cancelIrnFieldMapping, cancelIrnSchema }

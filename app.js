@@ -64,7 +64,7 @@ app.post('/api/auth', async (req, res) => {
         let { data } = await axios.post("/gstvital/v1.02/auth", oPayload, { headers: oHeaders });
         data.Data.Sek = encrypt.aesDecryption(data.Data.Sek, sAppKey);
         res.status(200).json({
-            Status: "Success",
+            Status: "Response Received from IRP Portal",
             Response: data,
         })
     } catch (error) {
@@ -82,7 +82,8 @@ app.post('/api/irn/create', async (req, res) => {
             aResponse = [];
         for (let i = 0; i < oData.length; i++) {
             let reqData = oData[i];
-            let oItem = getJSON.formatData(reqData);
+            let mode = "CREATE"
+            let oItem = getJSON.formatData(reqData, mode);
             let oResponse = {};
             let sEncryptedData = encrypt.aesEncryption(oItem, oHeader.sek)
             oResponse.doc_no = oItem.DocDtls.No;
@@ -105,6 +106,7 @@ app.post('/api/irn/create', async (req, res) => {
             aResponse.push(oResponse);
         }
         res.status(200).json({
+            Status: "Response Received from IRP Portal",
             Message: aResponse,
         })
     } catch (error) {
@@ -142,6 +144,7 @@ app.post('/api/irn/fetch', async (req, res) => {
         aResponse.push(oResponse);
     }
         res.status(200).json({
+            Status: "Response Received from IRP Portal",
             Message: aResponse,
         })
     } catch (error) {
@@ -161,10 +164,9 @@ app.post('/api/irn/cancel', async (req, res) => {
         for (let i = 0; i < oData.length; i++) {
             let oItem = {};
             let oResponse = {};
-            oResponse.doc_no = oData[i].doc_no;
-            oItem.Irn = oData[i].Irn;
-            oItem.CnlRsn = oData[i].CnlRsn;
-            oItem.CnlRem = oData[i].CnlRem;
+            let sMode = "CANCEL"
+            oResponse.doc_no = oData[i].NO;
+            oItem = getJSON.formatData(oData[i], sMode)
 
             let sEncryptedData = encrypt.aesEncryption(oItem, oHeader.sek);
             let oHeaders = {
@@ -186,6 +188,7 @@ app.post('/api/irn/cancel', async (req, res) => {
             aResponse.push(oResponse);
         }
         res.status(200).json({
+            Status: "Response Received from IRP Portal",
             Message: aResponse,
         })
     } catch (error) {

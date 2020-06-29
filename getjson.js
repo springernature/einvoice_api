@@ -1,12 +1,12 @@
 const config = require('./dataconfig'); 
 
-function formatData(oData) {
-    let oDocSchema = config.documentSchema();
-    let oMapping = config.fieldMapping();
+function formatData(oData, sMode) {
+    let sDocSchemaDetails = this.getSchemaDetails()[sMode];
+    let oDocSchema = config[sDocSchemaDetails.schema]();
+    let oMapping = config[sDocSchemaDetails.mapping]();
     let sSubMapping, sMapping;
     let oItemListSchema ={};
     for (const key in oData) {
-        console.log(key);
         if (oData.hasOwnProperty(key)) {
             let item = oData[key];
             sMapping = oMapping[key];
@@ -35,11 +35,27 @@ function formatData(oData) {
                 }
             }
             else{
-                oDocSchema[sMapping] = item ? item : oDocSchema[sMapping] ;
+                console.log(key + " & " + sMapping);
+                if(sMapping){
+                    oDocSchema[sMapping] = item ? item : oDocSchema[sMapping] ;
+                }
             }
         }
     }
     return oDocSchema;
 }
 
-module.exports = { formatData }
+function getSchemaDetails(){
+    return {
+        "CREATE":{
+            "schema":"documentSchema",
+            "mapping":"createIrnFieldMapping"
+        },
+        "CANCEL":{
+            "schema":"cancelIrnSchema",
+            "mapping":"cancelIrnFieldMapping"
+        }
+    }
+}
+
+module.exports = { formatData, getSchemaDetails }
