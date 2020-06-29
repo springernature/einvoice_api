@@ -6,7 +6,7 @@ const app = express();
 var random = require("random-key");
 const encrypt = require('./encrypt.js')
 const crypto = require('crypto');
-const getJSON = require('./getjson.js')
+const getJSON = require('./configuration/getjson.js')
 app.use(cors());
 app.use(express.json());
 
