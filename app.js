@@ -132,9 +132,9 @@ app.post('/api/irn/fetch', async (req, res) => {
         
     for (let i = 0; i < aData.length; i++) {
         let oData = aData[i];
-        let sIrn = oData.Irn,
+        let sIrn = oData.IRN_NO,
             oResponse = {};
-        oResponse.doc_no = oData.doc_no;
+        oResponse.doc_no = oData.NO;
         const { data } = await axios.get('gstcore/v1.02/Invoice/irn/' + sIrn, { headers: oHeaders });
         oResponse.res = data;
         if (!data.ErrorDetails) {

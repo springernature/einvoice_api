@@ -26,7 +26,6 @@ function aesDecryption(encryptedText, appkey) {
     }
     catch (error)
     {
-        debugger;
       throw error;
     }
 };
@@ -54,7 +53,6 @@ function aesEncryption(jsonData, sek) {
     }
     catch (error)
     {
-        debugger;
       throw error;
     }
 };
@@ -72,7 +70,6 @@ function aesDataDecryption(encryptedData, sek) {
     }
     catch (error)
     {
-        debugger;
       throw error;
     }
 }

@@ -200,7 +200,6 @@ function cancelIrnFieldMapping(){
         "IRN_NO":"Irn",
         "CNL_RSN":"CnlRsn",
         "CNL_REM":"CnlRem"
-        // "NO":"No"
     }
 }
 
