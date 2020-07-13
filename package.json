@@ -12,7 +12,6 @@
   "author": "Shivang Chaturvedi",
   "license": "ISC",
   "dependencies": {
-    "@hapi/joi": "^17.1.1",
     "axios": "^0.19.2",
     "babel-cli": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
@@ -23,8 +22,7 @@
     "express": "^4.17.1",
     "file-system": "^2.2.2",
     "node-rsa": "^1.0.8",
-    "path": "^0.12.7",
-    "random-key": "^0.3.2"
+    "path": "^0.12.7"
   },
   "devDependencies": {
     "nodemon": "^2.0.4"
