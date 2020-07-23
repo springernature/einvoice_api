@@ -107,10 +107,10 @@ app.post('/api/irn/create', async (req, res) => {
             oResponse.res = data;
             if (!data.ErrorDetails) {
                 let oDecryptedData = encrypt.aesDataDecryption(data.Data, oHeader.sek);
-                oResponse.res.StatusText = "The document has been successfully posted!";
+                oResponse.StatusText = "The document has been successfully posted!";
                 oResponse.res.Data = oDecryptedData;
             }else{
-                oResponse.res.StatusText = "The document went in error at IRP portal. Check the error logs in ErrorDetails.";
+                oResponse.StatusText = "The document went in error at IRP portal. Check the error logs in ErrorDetails.";
             }
             aResponse.push(oResponse);
         }
