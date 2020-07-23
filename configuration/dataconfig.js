@@ -211,4 +211,23 @@ function cancelIrnSchema(){
     }
 }
 
-module.exports = { documentSchema, itemListSchema, createIrnFieldMapping, cancelIrnFieldMapping, cancelIrnSchema }
+function authSchema(){
+    return {
+        "GSTIN": "",
+        "CLIENT_ID": "",
+        "USERNAME": "",
+        "PASSWORD": "",
+        "CLIENT_SECRET": "",
+        "PUBLICKEY1": "",
+        "PUBLICKEY2": ""
+    }
+}
+
+module.exports = { 
+    documentSchema, 
+    itemListSchema, 
+    createIrnFieldMapping, 
+    cancelIrnFieldMapping, 
+    cancelIrnSchema,
+    authSchema 
+}

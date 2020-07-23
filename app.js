@@ -5,6 +5,7 @@ const app = express();
 const encrypt = require('./resources/encrypt.js')
 const crypto = require('crypto');
 const getJSON = require('./configuration/getjson.js')
+const config = require('./configuration/dataconfig'); 
 app.use(cors());
 app.use(express.json());
 
@@ -17,57 +18,60 @@ app.get('/api', (req, res) => {
     });
 })
 
-app.post('/api/data', (req, res) => {
-    let data = req.body;
-    res.status(200).json({
-        Status: "Success",
-        data: data
-    });
-})
-
-
-app.post('/api/env/:var', (req, res) => {
-    console.log(process.env[req.params.var]);
-    const process_env = {
-        "env_var": process.env[req.params.var]
-    };
-    res.status(200).json({
-        Status: "Success",
-        Response: process_env
-    })
-})
-
 app.post('/api/auth', async (req, res) => {
     try {
         let aData = req.body;
         let aResponse = [];
         for (let i = 0; i < aData.length; i++) {
             let oData = aData[i];
+            let authSchema = config.authSchema();
+            let user = oData.USERNAME;
+            let errorDtls = {
+                errorFlag : false,
+                key:""
+            };
             let oResponse = {};
-            let sPublicKeyPath = !oData.PUBLICKEY1 ? "./public_key_dev/einv_sandbox.pem" : null;
-            oData.PUBLICKEY3 = oData.PUBLICKEY3 ? oData.PUBLICKEY3 : ""; 
-            let sPublicKey = oData.PUBLICKEY1 ? oData.PUBLICKEY1 + oData.PUBLICKEY2 + oData.PUBLICKEY3 : null; 
-            let sEncryptedPwd = encrypt.encryptStringWithRsaPublicKey(oData.PASSWORD, sPublicKey, sPublicKeyPath);
-            let sAppKey = crypto.randomBytes(32);
-            let sEncryptedAppKey = encrypt.encryptStringWithRsaPublicKey(sAppKey, sPublicKey, sPublicKeyPath);
-            let oHeaders = {
-                "client_id": oData.CLIENT_ID,
-                "client_secret": oData.CLIENT_SECRET
-            }
-            oData.ForceRefreshAccessToken = false;
-            let oPayload = {
-                "data": {
-                    "UserName": oData.USERNAME,
-                    "Password": sEncryptedPwd,
-                    "AppKey": sEncryptedAppKey,
-                    "ForceRefreshAccessToken": false
+            oResponse.username = oData.USERNAME;
+
+            //Validate all the data
+            for (const key in authSchema) {
+                if (authSchema.hasOwnProperty(key)) {
+                    if(!oData[key]){
+                        errorDtls.errorFlag = true;
+                        errorDtls.key = key;
+                        break;
+                    }
                 }
             }
-            let { data } = await axios.post("/gstvital/v1.02/auth", oPayload, { headers: oHeaders });
-            data.Data.Sek = encrypt.aesDecryption(data.Data.Sek, sAppKey);
-            oResponse.username = oData.USERNAME;
-            oResponse.res = data;
-            aResponse.push(oResponse);   
+            if(!errorDtls.errorFlag){
+                let sPublicKeyPath = !oData.PUBLICKEY1 ? "./public_key_dev/einv_sandbox.pem" : null;
+                oData.PUBLICKEY3 = oData.PUBLICKEY3 ? oData.PUBLICKEY3 : ""; 
+                let sPublicKey = oData.PUBLICKEY1 ? oData.PUBLICKEY1 + oData.PUBLICKEY2 + oData.PUBLICKEY3 : null; 
+                let sEncryptedPwd = encrypt.encryptStringWithRsaPublicKey(oData.PASSWORD, sPublicKey, sPublicKeyPath);
+                let sAppKey = crypto.randomBytes(32);
+                let sEncryptedAppKey = encrypt.encryptStringWithRsaPublicKey(sAppKey, sPublicKey, sPublicKeyPath);
+                let oHeaders = {
+                    "client_id": oData.CLIENT_ID,
+                    "client_secret": oData.CLIENT_SECRET
+                }
+                oData.ForceRefreshAccessToken = false;
+                let oPayload = {
+                    "data": {
+                        "UserName": oData.USERNAME,
+                        "Password": sEncryptedPwd,
+                        "AppKey": sEncryptedAppKey,
+                        "ForceRefreshAccessToken": false
+                    }
+                }
+                let { data } = await axios.post("/gstvital/v1.02/auth", oPayload, { headers: oHeaders });
+                if(data.Data){
+                    data.Data.Sek = encrypt.aesDecryption(data.Data.Sek, sAppKey);
+                }
+                oResponse.res = data;
+            } else{
+                oResponse.res = 'Value for '+errorDtls.key+' could not be found for user '+ user+'.'
+            } 
+            aResponse.push(oResponse); 
         }
         res.status(200).json({response: aResponse})
     } catch (error) {
@@ -85,10 +89,10 @@ app.post('/api/irn/create', async (req, res) => {
             aResponse = [];
         for (let i = 0; i < oData.length; i++) {
             let reqData = oData[i];
-            let mode = "CREATE"
+            let mode = "CREATE";
             let oItem = getJSON.formatData(reqData, mode);
             let oResponse = {};
-            let sEncryptedData = encrypt.aesEncryption(oItem, oHeader.sek)
+            let sEncryptedData = encrypt.aesEncryption(oItem, oHeader.sek);
             oResponse.doc_no = oItem.DocDtls.No;
             let oHeaders = {
                 "client_id": oHeader.client_id,
@@ -96,20 +100,22 @@ app.post('/api/irn/create', async (req, res) => {
                 "Gstin": oHeader.gstin,
                 "user_name": oHeader.user_name,
                 "AuthToken": oHeader.authtoken
-            }
+            };
             var oPayload = {
                 "Data": sEncryptedData
-            }
+            };
             let { data } = await axios.post("/gstcore/v1.02/Invoice", oPayload, { headers: oHeaders });
             oResponse.res = data;
             if (!data.ErrorDetails) {
-                oDecryptedData = encrypt.aesDataDecryption(data.Data, oHeader.sek);
+                let oDecryptedData = encrypt.aesDataDecryption(data.Data, oHeader.sek);
+                oResponse.res.StatusText = "The document has been successfully posted!";
                 oResponse.res.Data = oDecryptedData;
+            }else{
+                oResponse.res.StatusText = "The document went in error at IRP portal. Check the error logs in ErrorDetails.";
             }
             aResponse.push(oResponse);
         }
         res.status(200).json({
-            Status: "Response Received from IRP Portal",
             Message: aResponse,
         })
     } catch (error) {
