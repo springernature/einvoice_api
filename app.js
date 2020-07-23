@@ -66,13 +66,13 @@ app.post('/api/auth', async (req, res) => {
                 if(data.Data){
                     data.Data.Sek = encrypt.aesDecryption(data.Data.Sek, sAppKey);
                 }
-                oResponse.response = data;
+                oResponse.Response = data;
             } else{
-                oResponse.response = 'Value for '+errorDtls.key+' could not be found for user '+ user+'.'
+                oResponse.Response = 'Value for '+errorDtls.key+' could not be found for user '+ user+'.'
             } 
             aResponse.push(oResponse); 
         }
-        res.status(200).json({response: aResponse})
+        res.status(200).json({Responses: aResponse})
     } catch (error) {
         res.status(400).json({
             Status: "Error",
