@@ -39,32 +39,37 @@ app.post('/api/env/:var', (req, res) => {
 
 app.post('/api/auth', async (req, res) => {
     try {
-        let oData = req.body;
-        let sPublicKeyPath = !oData.PUBLICKEY1 ? "./public_key_dev/einv_sandbox.pem" : null;
-        oData.PUBLICKEY3 = oData.PUBLICKEY3 ? oData.PUBLICKEY3 : ""; 
-        let sPublicKey = oData.PUBLICKEY1 ? oData.PUBLICKEY1 + oData.PUBLICKEY2 + oData.PUBLICKEY3 : null; 
-        let sEncryptedPwd = encrypt.encryptStringWithRsaPublicKey(oData.PASSWORD, sPublicKey, sPublicKeyPath);
-        let sAppKey = crypto.randomBytes(32);
-        let sEncryptedAppKey = encrypt.encryptStringWithRsaPublicKey(sAppKey, sPublicKey, sPublicKeyPath);
-        let oHeaders = {
-            "client_id": oData.CLIENT_ID,
-            "client_secret": oData.CLIENT_SECRET
-        }
-        oData.ForceRefreshAccessToken = false;
-        let oPayload = {
-            "data": {
-                "UserName": oData.USERNAME,
-                "Password": sEncryptedPwd,
-                "AppKey": sEncryptedAppKey,
-                "ForceRefreshAccessToken": false
+        let aData = req.body;
+        let aResponse = [];
+        for (let i = 0; i < aData.length; i++) {
+            let oData = aData[i];
+            let oResponse = {};
+            let sPublicKeyPath = !oData.PUBLICKEY1 ? "./public_key_dev/einv_sandbox.pem" : null;
+            oData.PUBLICKEY3 = oData.PUBLICKEY3 ? oData.PUBLICKEY3 : ""; 
+            let sPublicKey = oData.PUBLICKEY1 ? oData.PUBLICKEY1 + oData.PUBLICKEY2 + oData.PUBLICKEY3 : null; 
+            let sEncryptedPwd = encrypt.encryptStringWithRsaPublicKey(oData.PASSWORD, sPublicKey, sPublicKeyPath);
+            let sAppKey = crypto.randomBytes(32);
+            let sEncryptedAppKey = encrypt.encryptStringWithRsaPublicKey(sAppKey, sPublicKey, sPublicKeyPath);
+            let oHeaders = {
+                "client_id": oData.CLIENT_ID,
+                "client_secret": oData.CLIENT_SECRET
             }
+            oData.ForceRefreshAccessToken = false;
+            let oPayload = {
+                "data": {
+                    "UserName": oData.USERNAME,
+                    "Password": sEncryptedPwd,
+                    "AppKey": sEncryptedAppKey,
+                    "ForceRefreshAccessToken": false
+                }
+            }
+            let { data } = await axios.post("/gstvital/v1.02/auth", oPayload, { headers: oHeaders });
+            data.Data.Sek = encrypt.aesDecryption(data.Data.Sek, sAppKey);
+            oResponse.username = oData.USERNAME;
+            oResponse.res = data;
+            aResponse.push(oResponse);   
         }
-        let { data } = await axios.post("/gstvital/v1.02/auth", oPayload, { headers: oHeaders });
-        data.Data.Sek = encrypt.aesDecryption(data.Data.Sek, sAppKey);
-        res.status(200).json({
-            Status: "Response Received from IRP Portal",
-            Response: data,
-        })
+        res.status(200).json({response: aResponse})
     } catch (error) {
         res.status(400).json({
             Status: "Error",
