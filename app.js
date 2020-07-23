@@ -31,7 +31,7 @@ app.post('/api/auth', async (req, res) => {
                 key:""
             };
             let oResponse = {};
-            oResponse.username = oData.USERNAME;
+            oResponse.UserName = oData.USERNAME;
 
             //Validate all the data
             for (const key in authSchema) {
