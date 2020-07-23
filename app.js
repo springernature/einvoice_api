@@ -44,12 +44,11 @@ app.post('/api/auth', async (req, res) => {
                 }
             }
             if(!errorDtls.errorFlag){
-                let sPublicKeyPath = !oData.PUBLICKEY1 ? "./public_key_dev/einv_sandbox.pem" : null;
                 oData.PUBLICKEY3 = oData.PUBLICKEY3 ? oData.PUBLICKEY3 : ""; 
                 let sPublicKey = oData.PUBLICKEY1 ? oData.PUBLICKEY1 + oData.PUBLICKEY2 + oData.PUBLICKEY3 : null; 
-                let sEncryptedPwd = encrypt.encryptStringWithRsaPublicKey(oData.PASSWORD, sPublicKey, sPublicKeyPath);
+                let sEncryptedPwd = encrypt.encryptStringWithRsaPublicKey(oData.PASSWORD, sPublicKey);
                 let sAppKey = crypto.randomBytes(32);
-                let sEncryptedAppKey = encrypt.encryptStringWithRsaPublicKey(sAppKey, sPublicKey, sPublicKeyPath);
+                let sEncryptedAppKey = encrypt.encryptStringWithRsaPublicKey(sAppKey, sPublicKey);
                 let oHeaders = {
                     "client_id": oData.CLIENT_ID,
                     "client_secret": oData.CLIENT_SECRET

@@ -3,11 +3,7 @@ const fs = require('file-system');
 const path = require('path');
 const CryptoJs = require('crypto-js');
 
-function encryptStringWithRsaPublicKey (toEncrypt, publicKey, filepath) {
-    if(filepath){
-        var absolutePath = path.resolve(filepath);
-        publicKey = fs.readFileSync(absolutePath, "utf8");
-    }
+function encryptStringWithRsaPublicKey (toEncrypt, publicKey) {
     var key = `-----BEGIN PUBLIC KEY-----\n${publicKey}\n-----END PUBLIC KEY-----`
     var buffer = Buffer.from(toEncrypt);
     var encrypted = crypto.publicEncrypt({key:key, padding : crypto.constants.RSA_PKCS1_PADDING}, buffer);
