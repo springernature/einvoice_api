@@ -66,9 +66,9 @@ app.post('/api/auth', async (req, res) => {
                 if(data.Data){
                     data.Data.Sek = encrypt.aesDecryption(data.Data.Sek, sAppKey);
                 }
-                oResponse.res = data;
+                oResponse.response = data;
             } else{
-                oResponse.res = 'Value for '+errorDtls.key+' could not be found for user '+ user+'.'
+                oResponse.response = 'Value for '+errorDtls.key+' could not be found for user '+ user+'.'
             } 
             aResponse.push(oResponse); 
         }
