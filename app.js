@@ -109,7 +109,7 @@ app.post('/api/irn/create', async (req, res) => {
                 oResponse.StatusText = "The document has been successfully posted!";
                 oResponse.res.Data = oDecryptedData;
             }else{
-                oResponse.StatusText = "The document went in error at IRP portal. Check the error logs in ErrorDetails.";
+                oResponse.StatusText = "The request went in error at IRP portal. Check the error logs in ErrorDetails.";
             }
             aResponse.push(oResponse);
         }
@@ -146,12 +146,14 @@ app.post('/api/irn/fetch', async (req, res) => {
         oResponse.res = data;
         if (!data.ErrorDetails) {
             oDecryptedData = encrypt.aesDataDecryption(data.Data, oHeader.sek);
+            oResponse.StatusText = "The IRN was successfully cancelled!";
             oResponse.res.Data = oDecryptedData;
+        }else{
+            oResponse.StatusText = "The request went in error at IRP portal. Check the error logs in ErrorDetails.";
         }
         aResponse.push(oResponse);
     }
         res.status(200).json({
-            Status: "Response Received from IRP Portal",
             Message: aResponse,
         })
     } catch (error) {
