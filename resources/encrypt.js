@@ -10,15 +10,21 @@ function encryptStringWithRsaPublicKey (toEncrypt, publicKey) {
     return encrypted.toString("base64");
 };
 
-function aesDecryption(encryptedText, appkey) {
+function aesDecryption(encryptedText, secretKey, bParse) {
     try
     {
-        const keyBytes = CryptoJs.enc.Base64.parse(appkey.toString("base64")); 
+        const keyBytes = CryptoJs.enc.Base64.parse(secretKey.toString("base64")); 
+        var oDecryptedData;
         var aDecryptWordArray = CryptoJs.AES.decrypt(encryptedText, keyBytes, {
             mode:CryptoJs.mode.ECB,
             padding:CryptoJs.pad.Pkcs7
         });
-        return CryptoJs.enc.Base64.stringify(aDecryptWordArray)
+        if(!bParse){
+            oDecryptedData = CryptoJs.enc.Base64.stringify(aDecryptWordArray);
+        }else{
+            oDecryptedData = JSON.parse(CryptoJs.enc.Utf8.stringify(aDecryptWordArray));   
+        }
+        return oDecryptedData;
     }
     catch (error)
     {

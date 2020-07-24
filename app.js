@@ -63,7 +63,7 @@ app.post('/api/auth', async (req, res) => {
                 }
                 let { data } = await axios.post("/gstvital/v1.02/auth", oPayload, { headers: oHeaders });
                 if(data.Data){
-                    data.Data.Sek = encrypt.aesDecryption(data.Data.Sek, sAppKey);
+                    data.Data.Sek = encrypt.aesDecryption(data.Data.Sek, sAppKey, false);
                 }
                 oResponse.Response = data;
             } else{
@@ -105,7 +105,7 @@ app.post('/api/irn/create', async (req, res) => {
             let { data } = await axios.post("/gstcore/v1.02/Invoice", oPayload, { headers: oHeaders });
             oResponse.res = data;
             if (!data.ErrorDetails) {
-                let oDecryptedData = encrypt.aesDataDecryption(data.Data, oHeader.sek);
+                let oDecryptedData = encrypt.aesDecryption(data.Data, oHeader.sek, true);
                 oResponse.StatusText = "The document has been successfully posted!";
                 oResponse.res.Data = oDecryptedData;
             }else{
@@ -145,7 +145,7 @@ app.post('/api/irn/fetch', async (req, res) => {
         const { data } = await axios.get('gstcore/v1.02/Invoice/irn/' + sIrn, { headers: oHeaders });
         oResponse.res = data;
         if (!data.ErrorDetails) {
-            oDecryptedData = encrypt.aesDataDecryption(data.Data, oHeader.sek);
+            oDecryptedData = encrypt.aesDecryption(data.Data, oHeader.sek, true);
             oResponse.StatusText = "The IRN was successfully cancelled!";
             oResponse.res.Data = oDecryptedData;
         }else{
@@ -191,7 +191,7 @@ app.post('/api/irn/cancel', async (req, res) => {
             let { data } = await axios.post("/gstcore/v1.02/Invoice/Cancel", oPayload, { headers: oHeaders });
             oResponse.res = data;
             if (!data.ErrorDetails) {
-                oDecryptedData = encrypt.aesDataDecryption(data.Data, oHeader.sek);
+                oDecryptedData = encrypt.aesDecryption(data.Data, oHeader.sek, true);
                 oResponse.res.Data = oDecryptedData;
             }
             aResponse.push(oResponse);
