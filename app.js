@@ -192,7 +192,10 @@ app.post('/api/irn/cancel', async (req, res) => {
             oResponse.res = data;
             if (!data.ErrorDetails) {
                 oDecryptedData = encrypt.aesDecryption(data.Data, oHeader.sek, true);
+                oResponse.StatusText = "The IRN was successfully cancelled!";
                 oResponse.res.Data = oDecryptedData;
+            }else{
+                oResponse.StatusText = "The request went in error at IRP portal. Check the error logs in ErrorDetails.";
             }
             aResponse.push(oResponse);
         }
