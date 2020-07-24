@@ -200,7 +200,6 @@ app.post('/api/irn/cancel', async (req, res) => {
             aResponse.push(oResponse);
         }
         res.status(200).json({
-            Status: "Response Received from IRP Portal",
             Message: aResponse,
         })
     } catch (error) {
